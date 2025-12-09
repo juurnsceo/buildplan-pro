@@ -1,0 +1,5 @@
+{
+  "name": "BuildPlan Pro",
+  "description": "A construction scheduler app allowing contractors to manage projects, subcontractors, tasks, and costs with a visual Gantt-style timeline and financial dashboard.",
+  "requestFramePermissions": []
+}
