@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { Project, Subcontractor, Task, AppState } from './types';
+import { Project, Subcontractor, Task, AppState, Trade } from './types';
 import { db, isConfigured } from './firebase';
-import { INITIAL_PROJECTS, INITIAL_SUBCONTRACTORS, INITIAL_TASKS } from './constants';
+import { INITIAL_PROJECTS, INITIAL_SUBCONTRACTORS, INITIAL_TASKS, INITIAL_TRADES } from './constants';
 import { v4 as uuidv4 } from 'uuid';
 import { 
   collection, 
@@ -20,6 +20,7 @@ export const useAppStore = () => {
     projects: [],
     subcontractors: [],
     tasks: [],
+    trades: [],
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -35,17 +36,24 @@ export const useAppStore = () => {
         localStorage.setItem('bp_projects', JSON.stringify(INITIAL_PROJECTS));
         localStorage.setItem('bp_subcontractors', JSON.stringify(INITIAL_SUBCONTRACTORS));
         localStorage.setItem('bp_tasks', JSON.stringify(INITIAL_TASKS));
+        localStorage.setItem('bp_trades', JSON.stringify(INITIAL_TRADES));
         setState({
           projects: INITIAL_PROJECTS,
           subcontractors: INITIAL_SUBCONTRACTORS,
-          tasks: INITIAL_TASKS
+          tasks: INITIAL_TASKS,
+          trades: INITIAL_TRADES,
         });
       } else {
+        const storedTrades = localStorage.getItem('bp_trades');
+        if (!storedTrades) {
+          localStorage.setItem('bp_trades', JSON.stringify(INITIAL_TRADES));
+        }
         // Load from storage
         setState({
           projects: JSON.parse(localProjects),
           subcontractors: JSON.parse(localStorage.getItem('bp_subcontractors') || '[]'),
           tasks: JSON.parse(localStorage.getItem('bp_tasks') || '[]'),
+          trades: storedTrades ? JSON.parse(storedTrades) : INITIAL_TRADES,
         });
       }
       setIsLoading(false);
@@ -70,10 +78,16 @@ export const useAppStore = () => {
       setIsLoading(false);
     });
 
+    const unsubTrades = onSnapshot(collection(db, 'trades'), (snapshot) => {
+      const trades = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Trade));
+      setState(prev => ({ ...prev, trades }));
+    });
+
     return () => {
       unsubProjects();
       unsubSubs();
       unsubTasks();
+      unsubTrades();
     };
   }, []);
 
@@ -106,15 +120,31 @@ export const useAppStore = () => {
     if (!isConfigured) {
       const s = { ...subData, id: uuidv4() } as Subcontractor;
       updateLocal('subcontractors', [...state.subcontractors, s]);
-      return;
+      return s.id;
     }
 
     try {
-      await addDoc(collection(db, 'subcontractors'), subData);
+      const docRef = await addDoc(collection(db, 'subcontractors'), subData);
+      return docRef.id;
     } catch (e) {
       console.error("Error adding sub: ", e);
     }
   }, [state.subcontractors]);
+
+  const addTrade = useCallback(async (tradeData: Omit<Trade, 'id'>) => {
+    if (!isConfigured) {
+      const trade = { ...tradeData, id: uuidv4() } as Trade;
+      updateLocal('trades', [...state.trades, trade]);
+      return trade.id;
+    }
+
+    try {
+      const docRef = await addDoc(collection(db, 'trades'), tradeData);
+      return docRef.id;
+    } catch (e) {
+      console.error("Error adding trade: ", e);
+    }
+  }, [state.trades]);
 
   const addTask = useCallback(async (taskData: Omit<Task, 'id'>) => {
     if (!isConfigured) {
@@ -183,6 +213,7 @@ export const useAppStore = () => {
     addTask,
     updateTask,
     deleteTask,
-    deleteSubcontractor
+    deleteSubcontractor,
+    addTrade
   };
 };

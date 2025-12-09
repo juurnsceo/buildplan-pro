@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ProjectList } from './components/ProjectList';
 import { ProjectDetail } from './components/ProjectDetail';
 import { useAppStore } from './store';
@@ -7,16 +7,36 @@ import { Task } from './types';
 import { Loader2, AlertTriangle } from 'lucide-react';
 
 const App: React.FC = () => {
-  const { state, isLoading, isConfigured, addProject, addSubcontractor, addTask, updateTask, deleteTask, deleteSubcontractor } = useAppStore();
+  const { state, isLoading, isConfigured, addProject, addSubcontractor, addTask, updateTask, deleteTask, deleteSubcontractor, addTrade } = useAppStore();
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   const selectedProject = state.projects.find(p => p.id === selectedProjectId);
-  const projectSubs = state.subcontractors.filter(s => s.projectId === selectedProjectId);
+
+  const tradesById = useMemo(() => {
+    const map = new Map<string, typeof state.trades[number]>();
+    state.trades.forEach(trade => {
+      map.set(trade.id, trade);
+    });
+    return map;
+  }, [state.trades]);
+
+  const subcontractorsWithTrade = useMemo(() => {
+    return state.subcontractors.map(sub => {
+      const trade = sub.tradeId ? tradesById.get(sub.tradeId) : undefined;
+      return {
+        ...sub,
+        trade: trade?.name || sub.trade || 'Unassigned',
+        tradeColor: trade?.color || sub.tradeColor,
+      };
+    });
+  }, [state.subcontractors, tradesById]);
+
+  const projectSubs = subcontractorsWithTrade.filter(s => s.projectId === selectedProjectId);
   const projectTasks = state.tasks.filter(t => t.projectId === selectedProjectId);
 
-  const handleAddSub = (subData: any) => {
+  const handleAddSub = async (subData: any) => {
     if (selectedProjectId) {
-      addSubcontractor({ ...subData, projectId: selectedProjectId });
+      return await addSubcontractor({ ...subData, projectId: selectedProjectId });
     }
   };
 
@@ -50,9 +70,11 @@ const App: React.FC = () => {
         <ProjectDetail 
           project={selectedProject}
           subcontractors={projectSubs}
+          trades={state.trades}
           tasks={projectTasks}
           onBack={() => setSelectedProjectId(null)}
           onAddSub={handleAddSub}
+          onAddTrade={addTrade}
           onAddTask={handleAddTask}
           onUpdateTask={updateTask}
           onDeleteTask={deleteTask}

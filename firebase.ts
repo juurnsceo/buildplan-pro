@@ -13,13 +13,22 @@ import { getFirestore } from 'firebase/firestore';
 // ------------------------------------------------------------------
 
 const firebaseConfig = {
-  apiKey: "REPLACE_WITH_YOUR_API_KEY",
-  authDomain: "replace-with-your-project.firebaseapp.com",
-  projectId: "replace-with-your-project",
-  storageBucket: "replace-with-your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456"
+
+  apiKey: "AIzaSyCllkCuE2bTju7WN1UN9eMnDWRgL7_-eto",
+
+  authDomain: "buildplan-pro.firebaseapp.com",
+
+  projectId: "buildplan-pro",
+
+  storageBucket: "buildplan-pro.firebasestorage.app",
+
+  messagingSenderId: "181069608174",
+
+  appId: "1:181069608174:web:4506f5b1b5a16b875e6fff"
+
 };
+
+
 
 // Check if the user has replaced the placeholder
 export const isConfigured = firebaseConfig.projectId !== "replace-with-your-project";

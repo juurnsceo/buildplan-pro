@@ -1,4 +1,4 @@
-import { Project, Subcontractor, Task } from './types';
+import { Project, Subcontractor, Task, Trade } from './types';
 
 export const INITIAL_PROJECTS: Project[] = [
   {
@@ -19,13 +19,22 @@ export const INITIAL_PROJECTS: Project[] = [
   }
 ];
 
+export const INITIAL_TRADES: Trade[] = [
+  { id: 'trade_excavator', name: 'Excavator', color: '#f97316' },
+  { id: 'trade_concrete', name: 'Concrete', color: '#6d28d9' },
+  { id: 'trade_framer', name: 'Framer', color: '#2563eb' },
+  { id: 'trade_electrician', name: 'Electrician', color: '#facc15' },
+  { id: 'trade_plumber', name: 'Plumber', color: '#0ea5e9' },
+  { id: 'trade_demo', name: 'Demolition', color: '#ef4444' },
+];
+
 export const INITIAL_SUBCONTRACTORS: Subcontractor[] = [
-  { id: 's1', projectId: 'p1', name: 'ABC Excavation', trade: 'Excavator' },
-  { id: 's2', projectId: 'p1', name: 'Solid Foundations', trade: 'Concrete' },
-  { id: 's3', projectId: 'p1', name: 'Top Notch Framing', trade: 'Framer' },
-  { id: 's4', projectId: 'p1', name: 'Sparky Electric', trade: 'Electrician' },
-  { id: 's5', projectId: 'p1', name: 'Flow Plumbing', trade: 'Plumber' },
-  { id: 's6', projectId: 'p2', name: 'City Demolition', trade: 'Demolition' },
+  { id: 's1', projectId: 'p1', name: 'ABC Excavation', trade: 'Excavator', tradeId: 'trade_excavator' },
+  { id: 's2', projectId: 'p1', name: 'Solid Foundations', trade: 'Concrete', tradeId: 'trade_concrete' },
+  { id: 's3', projectId: 'p1', name: 'Top Notch Framing', trade: 'Framer', tradeId: 'trade_framer' },
+  { id: 's4', projectId: 'p1', name: 'Sparky Electric', trade: 'Electrician', tradeId: 'trade_electrician' },
+  { id: 's5', projectId: 'p1', name: 'Flow Plumbing', trade: 'Plumber', tradeId: 'trade_plumber' },
+  { id: 's6', projectId: 'p2', name: 'City Demolition', trade: 'Demolition', tradeId: 'trade_demo' },
 ];
 
 export const INITIAL_TASKS: Task[] = [

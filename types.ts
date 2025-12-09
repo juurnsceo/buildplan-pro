@@ -11,7 +11,9 @@ export interface Subcontractor {
   id: string;
   projectId: string;
   name: string;
-  trade: string; // e.g., 'Plumber', 'Electrician'
+  tradeId?: string;
+  trade?: string; // e.g., 'Plumber', 'Electrician'
+  tradeColor?: string;
   contactInfo?: string;
 }
 
@@ -29,10 +31,17 @@ export interface Task {
   estimatedCost: number;
 }
 
+export interface Trade {
+  id: string;
+  name: string;
+  color: string;
+}
+
 export interface AppState {
   projects: Project[];
   subcontractors: Subcontractor[];
   tasks: Task[];
+  trades: Trade[];
 }
 
 export interface ProjectStats {
